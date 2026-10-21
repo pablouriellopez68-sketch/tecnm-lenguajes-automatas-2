@@ -35,12 +35,12 @@
 ### 2.2 Prompt Estructurado
 ```text
 [Pega aquí el prompt formal que redactaste para la IA]
-> [ROL]
+[ROL]
 Actúa como ingeniero de software de sistemas y compiladores. Tu criterio
 de calidad es la seguridad de memoria y el cumplimiento estricto del
 estándar, no la brevedad.
 
->[ESPECIFICACIÓN]
+[ESPECIFICACIÓN]
 Implementa:  char *reverse_buffer(char *buf);
 - Invierte in-place la cadena terminada en '\0' apuntada por buf.
 - Recorrido exclusivamente por aritmética de punteros, sin indexación [].
@@ -54,7 +54,7 @@ Implementa:  char *reverse_buffer(char *buf);
 - Declara explícitamente cualquier precondición que el llamador deba
   garantizar.
 
->[OUTPUT]
+[OUTPUT]
 Entrega únicamente:
 1. El código C, modular, con la función de utilidad separada si aplica.
 2. Un test harness con main() que ejerza los casos borde listados.
