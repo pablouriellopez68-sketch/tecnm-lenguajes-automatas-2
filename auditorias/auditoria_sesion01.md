@@ -68,6 +68,40 @@ No incluyas explicación en prosa fuera de los comentarios del código.
 ```c
 // Código devuelto por el LLM
 ```
+#include <stddef.h>
+
+/* Intercambio de un rango cerrado [a, b]. */
+static void reverse_range(char *a, char *b)
+{
+    while (a < b) {
+        char tmp = *a;
+        *a++ = *b;
+        *b-- = tmp;
+    }
+}
+
+/* Invierte in-place la cadena terminada en '\0' apuntada por buf.
+ * Devuelve el mismo puntero (o NULL si la entrada es NULL).
+ * PRECONDICIÓN: buf debe apuntar a memoria escribible, nunca a un
+ * literal de cadena (char *s = "x" vive en .rodata -> SIGSEGV).
+ */
+char *reverse_buffer(char *buf)
+{
+    if (buf == NULL) {
+        return NULL;                 /* contrato defensivo: NULL in, NULL out */
+    }
+
+    char *end = buf;
+    while (*end != '\0') {           /* medición sin size_t: evita el underflow */
+        end++;
+    }
+    if (end == buf) {
+        return buf;                  /* cadena vacía: nada que invertir */
+    }
+
+    reverse_range(buf, end - 1);     /* end-1 = último carácter real */
+    return buf;
+}
 
 ---
 
