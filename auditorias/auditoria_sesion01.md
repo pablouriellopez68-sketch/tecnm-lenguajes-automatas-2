@@ -116,6 +116,7 @@ char *reverse_buffer(char *buf)
 **Salida del harness:**
 
 ```
+== V1: reverse_buffer (byte a byte) ==
 [OK  ] NULL                   esperado="(null)"  obtenido="(null)"
 [OK  ] cadena vacia           esperado=""  obtenido=""
 [OK  ] un caracter            esperado="a"  obtenido="a"
@@ -125,8 +126,18 @@ char *reverse_buffer(char *buf)
 [OK  ] doble inversion        esperado="automatas"  obtenido="automatas"
 [OK  ] buffer holgado         esperado="aloh"  obtenido="aloh"
 [OK  ] bytes de control       esperado="9	x"  obtenido="9	x"
+[NOTA] V1 sobre UTF-8     "Autómatas" -> "satam??tuA" (mojibake esperado)
+
+== V2: reverse_utf8 (consciente de multibyte) ==
+[OK  ] UTF-8 acentuado        esperado="satamótuA"  obtenido="satamótuA"
+[OK  ] UTF-8 extremos         esperado="údnañ"  obtenido="údnañ"
+[OK  ] UTF-8 mixto            esperado="6202 oña"  obtenido="6202 oña"
+[OK  ] ASCII via V2           esperado="edcba"  obtenido="edcba"
+[OK  ] vacia via V2           esperado=""  obtenido=""
+[OK  ] NULL via V2            esperado="(null)"  obtenido="(null)"
 
 TODAS LAS PRUEBAS PASARON (0 fallos)
+
 ```
 
 | Caso borde                 | Resultado | Observación                                     |
