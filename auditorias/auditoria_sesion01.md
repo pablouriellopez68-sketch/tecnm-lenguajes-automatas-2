@@ -35,6 +35,31 @@
 ### 2.2 Prompt Estructurado
 ```text
 [Pega aquí el prompt formal que redactaste para la IA]
+> [ROL]
+Actúa como ingeniero de software de sistemas y compiladores. Tu criterio
+de calidad es la seguridad de memoria y el cumplimiento estricto del
+estándar, no la brevedad.
+
+>[ESPECIFICACIÓN]
+Implementa:  char *reverse_buffer(char *buf);
+- Invierte in-place la cadena terminada en '\0' apuntada por buf.
+- Recorrido exclusivamente por aritmética de punteros, sin indexación [].
+- Complejidad obligatoria: O(n) en tiempo, O(1) en memoria auxiliar.
+  Queda prohibido reservar un buffer temporal o llamar a malloc.
+- Devuelve el mismo puntero recibido; si buf es NULL, devuelve NULL
+  sin desreferenciar.
+- Debe manejar correctamente: puntero NULL, cadena vacía, longitud 1,
+  longitudes pares e impares, y buffers cuya capacidad excede la
+  longitud de la cadena (no debe tocar los bytes posteriores al '\0').
+- Declara explícitamente cualquier precondición que el llamador deba
+  garantizar.
+
+>[OUTPUT]
+Entrega únicamente:
+1. El código C, modular, con la función de utilidad separada si aplica.
+2. Un test harness con main() que ejerza los casos borde listados.
+3. El análisis de complejidad en tiempo y memoria, justificado.
+No incluyas explicación en prosa fuera de los comentarios del código.
 ```
 
 ---
