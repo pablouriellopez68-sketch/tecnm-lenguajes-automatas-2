@@ -34,7 +34,7 @@
 
 ### 2.2 Prompt Estructurado
 ```text
-[Pega aquí el prompt formal que redactaste para la IA]
+
 [ROL]
 Actúa como ingeniero de software de sistemas y compiladores. Tu criterio
 de calidad es la seguridad de memoria y el cumplimiento estricto del
