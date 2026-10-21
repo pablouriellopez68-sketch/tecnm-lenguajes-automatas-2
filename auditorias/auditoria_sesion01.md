@@ -66,9 +66,7 @@ No incluyas explicación en prosa fuera de los comentarios del código.
 
 ## 3. Código Devuelto por el Modelo
 ```c
-// Código devuelto por el LLM
-```
-#include <stddef.h>
+// #include <stddef.h>
 
 /* Intercambio de un rango cerrado [a, b]. */
 static void reverse_range(char *a, char *b)
@@ -102,6 +100,7 @@ char *reverse_buffer(char *buf)
     reverse_range(buf, end - 1);     /* end-1 = último carácter real */
     return buf;
 }
+```
 
 ---
 
