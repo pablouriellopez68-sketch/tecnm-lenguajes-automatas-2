@@ -3,6 +3,7 @@
 **Tema:** Encuadre, Diagnóstico de Punteros y Metodología IA  
 **Docente Titular:** MCC. Iván Márquez Larios (`ijmarquezl`)  
 **Estudiante:** Pablo Uriel Desiderio López.
+
 **Matrícula:** 24531372.
 **Track:** [ C | Rust ]  
 
