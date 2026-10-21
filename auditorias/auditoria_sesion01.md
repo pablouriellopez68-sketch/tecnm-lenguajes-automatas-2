@@ -116,4 +116,4 @@ char *reverse_buffer(char *buf)
 > 
 
 ---
-**Firma digital:** [Usuario de GitHub]
+**Firma digital:** . pablouriellopez68-sketch .
