@@ -1,0 +1,6 @@
+-El terminador no es parte del dato. La primera versión que escribí hacía end = buf + strlen(buf) y empezaba a intercambiar ahí: eso mete el '\0' al inicio de la cadena y la trunca a longitud cero. Hay que posicionarse en end - 1.
+-strlen devuelve size_t, que es sin signo. Con la cadena vacía, strlen(buf) - 1 no da -1: da SIZE_MAX, y el acceso resultante se sale del buffer. Por eso la guarda del caso vacío tiene que ir antes de cualquier resta, y preferí recorrer con puntero (while (*end) end++) en vez de aritmética sobre size_t.
+-La condición del bucle debe ser start < end, no <=. Con <=, una longitud impar intercambia el carácter central consigo mismo —inofensivo— pero los punteros se cruzan y la siguiente iteración escribe fuera del rango ya procesado.
+-No todo char* es escribible. char *s = "hola"; apunta a .rodata; invertirlo in-place es comportamiento indefinido y en mi equipo termina en SIGSEGV. La restricción O(1) de memoria obliga a modificar el original, así que el contrato de la función tiene que exigir explícitamente un arreglo (char s[] = "hola";) o memoria de malloc.
+
+La restricción de O(1) memoria es la que vuelve interesante el ejercicio: prohíbe la salida fácil de reservar un buffer auxiliar y copiar hacia atrás.
