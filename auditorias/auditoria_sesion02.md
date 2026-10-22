@@ -2,9 +2,9 @@
 **Materia:** Lenguajes y Autómatas II (SCD-1016)  
 **Tema:** Gestión en GitHub Web y Nodos Dinámicos  
 **Docente Titular:** MCC. Iván Márquez Larios (`ijmarquezl`)  
-**Estudiante:** [Nombre Completo]  
-**Matrícula:** [No. de Control]  
-**Track:** [ C | Rust ]  
+**Estudiante:** Pablo Desiderio López
+**Matrícula:** 24531272
+**Track:** C
 
 ---
 
