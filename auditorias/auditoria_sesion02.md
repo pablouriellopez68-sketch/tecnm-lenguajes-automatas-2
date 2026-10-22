@@ -4,7 +4,7 @@
 **Docente Titular:** MCC. Iván Márquez Larios (`ijmarquezl`)
 **Estudiante:** Pablo Desiderio López
 **Matrícula:** 24531272
-**Track:** C
+**Track:** c
 
 ---
 
