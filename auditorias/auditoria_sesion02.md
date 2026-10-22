@@ -27,7 +27,6 @@
 
 ### 2.2 Prompt Estructurado
 ```text
-
 [CONTEXTO]
 Estándar C99 compilado con GCC usando -std=c99 -Wall -Wextra -pedantic.
 Únicamente biblioteca estándar; sin dependencias externas. Destino:
@@ -66,7 +65,42 @@ No incluyas explicación en prosa fuera de los comentarios del código.
 
 ## 3. Código Devuelto por el Modelo
 ```c
-// Código devuelto por el LLM
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Token {
+    char *lexema;
+    struct Token *sig;
+} Token;
+
+typedef struct {
+    Token *cabeza;
+} Lista;
+
+void lista_init(Lista *l)
+{
+    l->cabeza = NULL;
+}
+
+int lista_agregar(Lista *l, const char *lexema)
+{
+    Token *n = malloc(sizeof(Token));
+    n->lexema = strdup(lexema);
+    n->sig = l->cabeza;
+    l->cabeza = n;
+    return 0;
+}
+
+void lista_liberar(Lista *l)
+{
+    Token *p = l->cabeza;
+    while (p) {
+        Token *sig = p->sig;
+        free(p);
+        p = sig;
+    }
+}
 ```
 
 ---
