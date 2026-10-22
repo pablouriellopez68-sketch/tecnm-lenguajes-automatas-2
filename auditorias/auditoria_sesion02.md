@@ -27,7 +27,53 @@
 
 ### 2.2 Prompt Estructurado
 ```text
-[Pega aquí el prompt formal que redactaste para la IA]
+
+[CONTEXTO]
+Estándar C99 compilado con GCC usando -std=c99 -Wall -Wextra -pedantic.
+Únicamente la biblioteca estándar de C99: sin POSIX, sin extensiones GNU,
+sin dependencias externas. Destino: front-end de un compilador, tabla de
+tokens construida en memoria dinámica.
+
+[ROL]
+Actúa como ingeniero de software de sistemas y compiladores. Tu criterio
+de calidad es la seguridad de memoria y el cumplimiento estricto del
+estándar, no la brevedad.
+
+[ESPECIFICACIÓN]
+Implementa una lista enlazada simple de tokens alojada en el heap:
+
+    typedef struct Token { char *lexema; struct Token *sig; } Token;
+    typedef struct { Token *cabeza; size_t n; } Lista;
+
+    void lista_init(Lista *l);
+    int  lista_agregar(Lista *l, const char *lexema);
+    void lista_liberar(Lista *l);
+
+Requisitos obligatorios:
+- La lista debe ser DUEÑA de su copia del lexema: `lista_agregar` reserva
+  memoria propia y copia la cadena, de modo que el llamador pueda
+  modificar o destruir su buffer sin afectar a la lista.
+- Toda función que reserve memoria debe comprobar el valor devuelto por
+  malloc y propagar el fallo sin dejar reservas a medias.
+- `lista_liberar` debe liberar el lexema Y el nodo de cada elemento, y
+  dejar la lista en un estado reutilizable, de forma que una segunda
+  llamada sea inocua (sin doble free ni use-after-free).
+- Entradas nulas: puntero a lista NULL y lexema NULL deben rechazarse
+  devolviendo -1, sin desreferenciar.
+- La cadena vacía "" es un lexema válido, no un error.
+- Complejidad obligatoria: `lista_agregar` en O(1); `lista_liberar` en
+  O(n) con O(1) de memoria auxiliar (sin recursión).
+- No uses strdup: no forma parte de C99.
+
+[OUTPUT]
+Entrega únicamente:
+1. El código C modular (cabecera + implementación).
+2. Un test harness con main() que ejerza: lista vacía, lexema NULL,
+   lista NULL, cadena vacía, independencia de la copia, doble liberación
+   y liberación de NULL.
+3. El análisis de complejidad en tiempo y memoria, justificado.
+No incluyas explicación en prosa fuera de los comentarios del código.
+
 ```
 
 ---
