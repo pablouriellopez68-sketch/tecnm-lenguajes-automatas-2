@@ -4,7 +4,7 @@
 **Docente Titular:** MCC. Iván Márquez Larios (`ijmarquezl`)
 **Estudiante:** Pablo Desiderio López
 **Matrícula:** 24531272
-**Track:** c
+**Track:** C
 
 ---
 
@@ -41,7 +41,7 @@ Actúa como ingeniero de software de sistemas y compiladores.
 Implementa exactamente este contrato, sin alterar ninguna firma:
 
     typedef struct NodoToken {
-        char lexema[32];
+        char lexema[16];
         struct NodoToken *siguiente;
     } NodoToken;
 
@@ -132,7 +132,7 @@ void liberar_lista(NodoToken *cabeza)
 
 ### Hallazgo 1: desbordamiento de heap en `crear_nodo`
 
-El harness del cuaderno aprueba el código del modelo con 6/6, pero sus seis casos usan lexemas de una a tres letras. El campo declarado en el contrato es `char lexema[16]`, de modo que el nodo completo mide 24 bytes (16 del arreglo más 8 del puntero `siguiente`). Al pasar un identificador de 29 caracteres, AddressSanitizer reporta:
+El harness del cuaderno aprueba el código del modelo con 6/6, pero sus seis casos usan lexemas de una a tres letras. El contrato declara `char lexema[16]`, de modo que el nodo completo mide 24 bytes (16 del arreglo más 8 del puntero `siguiente`). Al pasar un identificador de 29 caracteres, AddressSanitizer reporta:
 
 ```
 ==311==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058
@@ -143,14 +143,14 @@ SUMMARY: AddressSanitizer: heap-buffer-overflow in strcpy
 
 ### Hallazgo 2: corrupción silenciosa entre 16 y 23 caracteres
 
-Más peligroso que el crash: con un lexema de 19 caracteres la escritura rebasa el arreglo pero **cabe dentro del nodo**, así que ASan no la detecta y el programa no falla. El lexema queda truncado sin aviso y su terminador acaba fuera del arreglo:
+Más peligroso que el crash: con un lexema de 19 caracteres la escritura rebasa el arreglo pero cabe dentro de los 24 bytes del nodo, así que ASan no la detecta y el programa no falla. El lexema queda truncado sin aviso y su terminador acaba fuera del arreglo:
 
 ```
 pedido  : 19 caracteres
 guardado: "identificador_la" (16 caracteres)
 ```
 
-Con solo 15 caracteres útiles, dos identificadores distintos que compartan ese prefijo se convierten en el mismo token, y la tabla de símbolos los confunde sin emitir ningún error.
+Con solo 15 caracteres útiles, dos identificadores distintos que compartan ese prefijo se convierten en el mismo token y la tabla de símbolos los confunde sin emitir ningún error.
 
 ### Resultados tras la corrección
 
@@ -184,7 +184,7 @@ TODAS LAS PRUEBAS PASARON (0 fallos)
 | Orden de inserción               | Pasa      | El enlace al final preserva la secuencia léxica     |
 | Fugas de memoria                 | Pasa      | Una sola reserva por nodo: el lexema vive dentro    |
 
-**Complejidad verificada:** al ser `lexema` un arreglo embebido y no un puntero, cada token requiere una única reserva y no existen cadenas huérfanas que fugar. `agregar_token` recorre hasta el final en cada llamada: O(n) por inserción y **O(n²)** para construir una tabla de n tokens.
+**Complejidad verificada:** al ser `lexema` un arreglo embebido y no un puntero, cada token requiere una única reserva y no existen cadenas huérfanas que fugar. `agregar_token` recorre hasta el final en cada llamada: O(n) por inserción y O(n²) para construir una tabla de n tokens.
 
 ### Reporte Crítico
 *¿Qué caso borde o problema omitió la IA y cómo lo solucionaste?*
@@ -201,6 +201,7 @@ TODAS LAS PRUEBAS PASARON (0 fallos)
 > **4. `malloc` sin comprobar.** Si la reserva falla, `crear_nodo` desreferencia NULL de inmediato. La corrección devuelve NULL y `agregar_token` descarta el nodo en lugar de enlazar basura. El contrato declara `void` para `agregar_token`, así que el fallo no puede propagarse al llamador: es una limitación de la API, no del modelo, y la documento como tal.
 >
 > **Conclusión metodológica.** El hallazgo más incómodo no es ninguno de los cuatro anteriores, sino que **el harness oficial aprueba el código defectuoso**. Sus seis casos usan lexemas de una a tres letras, así que el límite de 16 nunca se toca. Un 6/6 en verde certifica que el código hace lo que las pruebas miden, no que sea correcto: la prueba que falta es exactamente la que nadie escribió. En la Sesión 01 la lección fue que la IA no audita lo que el prompt calla; aquí la lección es que el harness tampoco audita lo que sus casos callan. Por eso la auditoría real exige herramientas que observen la ejecución y casos construidos a propósito para rebasar los límites declarados en el contrato — y aun así, el caso de 19 caracteres demuestra que ni siquiera ASan encuentra todo: ese lo detecté comparando la cadena guardada contra la pedida.
+
 ---
 
 **Firma digital:** pablouriellopez68-sketch
