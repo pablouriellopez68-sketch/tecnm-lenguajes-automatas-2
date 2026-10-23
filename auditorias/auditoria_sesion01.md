@@ -2,7 +2,7 @@
 **Materia:** Lenguajes y Autómatas II (SCD-1016)
 **Tema:** Encuadre, Diagnóstico de Punteros y Metodología IA
 **Docente Titular:** MCC. Iván Márquez Larios (`ijmarquezl`)
-**Estudiante:** Pablo Desiderio López
+**Estudiante:** Pablo Uriel Desiderio López
 **Matrícula:** 24531272
 **Track:** C
 
