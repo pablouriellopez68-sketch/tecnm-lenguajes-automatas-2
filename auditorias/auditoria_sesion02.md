@@ -11,7 +11,17 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Lista enlazada de tokens en Heap
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
+> Completé las cuatro funciones a mano, partiendo de 2/6 con los esqueletos vacíos. Los tropiezos fueron de sintaxis de punteros, no de lógica: la idea del recorrido la tenía clara desde el principio, pero traducirla a C me costó varios intentos.
 >
+> El primero fue confundir el encabezado de la función con el cuerpo. Escribí `NodoToken *crear_nodo(...) = ...` tratando de usar el nombre de la función como si fuera una variable. Me faltaba entender que el encabezado solo declara qué recibe la función, y que los parámetros —como `lexema`— se nombran a secas una vez dentro de las llaves. Una versión de ese mismo error me costó el mensaje `'lexema' undeclared here (not in a function)`: había escrito las líneas fuera del cuerpo de `agregar_token`.
+>
+> El segundo, y el más repetido, fue olvidar el operador flecha. Escribí `strcpy(lexema, ...)` cuando el destino era `n->lexema`, y `p = siguiente;` cuando debía ser `p = p->siguiente;`. Un campo no existe por sí solo: siempre hay que decir a qué nodo pertenece. También escribí una vez `p>siguiente`, sin el guion, y el compilador lo interpretó como una comparación "mayor que" en lugar de un acceso a campo.
+>
+> El tercero fue escribir `p->siguiente;` como instrucción suelta dentro del `while`, sin la asignación `p = `. Compila, pero `p` nunca cambia y el bucle no termina nunca. Me hizo ver que en C una expresión válida no es necesariamente una instrucción útil.
+>
+> También intenté reutilizar `n` como puntero caminante en `agregar_token`. Entender por qué no se puede fue el momento más útil: `n` guarda la dirección del nodo nuevo, y si la sobrescribo para recorrer la lista pierdo la única referencia que tengo a ese nodo, que queda reservado en el heap sin que nadie pueda liberarlo.
+>
+> La restricción de memoria propiamente dicha apareció en `liberar_lista`. `malloc` entrega memoria sin inicializar, así que `crear_nodo` tiene que dejar los dos campos en estado válido antes de devolver el nodo —copiar el lexema y poner `siguiente` en NULL— porque un `siguiente` con basura haría que el recorrido saltara a una dirección inválida en vez de detenerse. Y al liberar, el orden importa: `free(p)` devuelve la memoria del nodo, de modo que leer `p->siguiente` después de liberarlo sería acceder a memoria ajena. Por eso hay que guardar el enlace en una variable temporal antes del `free`. Ese es el use-after-free que da nombre a la Fase 3 de esta sesión.
 
 ---
 
@@ -130,9 +140,36 @@ void liberar_lista(NodoToken *cabeza)
 
 **Entorno:** GCC 13.3.0, compilado con `-std=c11 -Wall -Wextra -Werror -fsanitize=address,undefined -g`.
 
+### Ejecución del harness oficial
+
+Compilado en Google Colab con GCC 13.3.0 y los flags que indica el cuaderno (`-std=c11 -Wall -Wextra -Werror`).
+
+Contra la implementación propia de la Fase 1:
+
+```
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion02.md
+```
+
+Contra el código devuelto por la IA:
+
+```
+[ 1] crear_nodo("if")->lexema      esperado: if          obtenido: if          OK
+[ 2] contar_tokens(3 tokens)       esperado: 3           obtenido: 3           OK
+[ 3] orden: segundo token          esperado: dos         obtenido: dos         OK
+[ 4] ultimo->siguiente == NULL     esperado: 1           obtenido: 1           OK
+[ 5] contar_tokens(NULL)           esperado: 0           obtenido: 0           OK
+[ 6] liberar_lista(NULL)           esperado: sin crash   obtenido: sin crash   OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion02.md
+```
+
+Ambas implementaciones obtienen el mismo 6/6, pese a que la del modelo contiene un desbordamiento de heap. Los seis casos del harness usan los lexemas `"if"`, `"x"`, `";"`, `"uno"`, `"dos"`, `"a"` y `"b"`: ninguno pasa de tres caracteres, así que el límite de 16 del campo `lexema` nunca llega a tocarse. Ese contraste es el punto de partida de la auditoría que sigue.
+
 ### Hallazgo 1: desbordamiento de heap en `crear_nodo`
 
-El harness del cuaderno aprueba el código del modelo con 6/6, pero sus seis casos usan lexemas de una a tres letras. El contrato declara `char lexema[16]`, de modo que el nodo completo mide 24 bytes (16 del arreglo más 8 del puntero `siguiente`). Al pasar un identificador de 29 caracteres, AddressSanitizer reporta:
+El contrato declara `char lexema[16]`, de modo que el nodo completo mide 24 bytes (16 del arreglo más 8 del puntero `siguiente`). Al pasar un identificador de 29 caracteres, AddressSanitizer reporta:
 
 ```
 ==311==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058
@@ -200,7 +237,7 @@ TODAS LAS PRUEBAS PASARON (0 fallos)
 >
 > **4. `malloc` sin comprobar.** Si la reserva falla, `crear_nodo` desreferencia NULL de inmediato. La corrección devuelve NULL y `agregar_token` descarta el nodo en lugar de enlazar basura. El contrato declara `void` para `agregar_token`, así que el fallo no puede propagarse al llamador: es una limitación de la API, no del modelo, y la documento como tal.
 >
-> **Conclusión metodológica.** El hallazgo más incómodo no es ninguno de los cuatro anteriores, sino que **el harness oficial aprueba el código defectuoso**. Sus seis casos usan lexemas de una a tres letras, así que el límite de 16 nunca se toca. Un 6/6 en verde certifica que el código hace lo que las pruebas miden, no que sea correcto: la prueba que falta es exactamente la que nadie escribió. En la Sesión 01 la lección fue que la IA no audita lo que el prompt calla; aquí la lección es que el harness tampoco audita lo que sus casos callan. Por eso la auditoría real exige herramientas que observen la ejecución y casos construidos a propósito para rebasar los límites declarados en el contrato — y aun así, el caso de 19 caracteres demuestra que ni siquiera ASan encuentra todo: ese lo detecté comparando la cadena guardada contra la pedida.
+> **Conclusión metodológica.** El hallazgo más incómodo no es ninguno de los cuatro anteriores, sino que **el harness oficial aprueba por igual mi implementación y la del modelo**, aunque una de las dos desborde el heap. Sus seis casos usan lexemas de una a tres letras, así que el límite de 16 nunca se toca. Un 6/6 en verde certifica que el código hace lo que las pruebas miden, no que sea correcto: la prueba que falta es exactamente la que nadie escribió. En la Sesión 01 la lección fue que la IA no audita lo que el prompt calla; aquí la lección es que el harness tampoco audita lo que sus casos callan. Por eso la auditoría real exige herramientas que observen la ejecución y casos construidos a propósito para rebasar los límites declarados en el contrato — y aun así, el caso de 19 caracteres demuestra que ni siquiera ASan encuentra todo: ese lo detecté comparando la cadena guardada contra la pedida.
 
 ---
 
