@@ -142,11 +142,21 @@ void liberar_lista(NodoToken *cabeza)
 
 ### Ejecución del harness oficial
 
+### Ejecución del harness oficial
+
 Compilado en Google Colab con GCC 13.3.0 y los flags que indica el cuaderno (`-std=c11 -Wall -Wextra -Werror`).
 
 Contra la implementación propia de la Fase 1:
 
 ```
+=== AUDITORIA SESION 02 - Lista enlazada de tokens en heap ===
+[ 1] crear_nodo("if")->lexema      esperado: if           obtenido: if           OK
+[ 2] contar_tokens(3 tokens)       esperado: 3            obtenido: 3            OK
+[ 3] orden: segundo token          esperado: dos          obtenido: dos          OK
+[ 4] ultimo->siguiente == NULL     esperado: 1            obtenido: 1            OK
+[ 5] contar_tokens(NULL)           esperado: 0            obtenido: 0            OK
+[ 6] liberar_lista(NULL)           esperado: sin crash    obtenido: sin crash    OK
+
 RESULTADO: 6/6 pruebas superadas
 TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion02.md
 ```
@@ -154,16 +164,19 @@ TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion02.md
 Contra el código devuelto por la IA:
 
 ```
-[ 1] crear_nodo("if")->lexema      esperado: if          obtenido: if          OK
-[ 2] contar_tokens(3 tokens)       esperado: 3           obtenido: 3           OK
-[ 3] orden: segundo token          esperado: dos         obtenido: dos         OK
-[ 4] ultimo->siguiente == NULL     esperado: 1           obtenido: 1           OK
-[ 5] contar_tokens(NULL)           esperado: 0           obtenido: 0           OK
-[ 6] liberar_lista(NULL)           esperado: sin crash   obtenido: sin crash   OK
+=== AUDITORIA SESION 02 - Lista enlazada de tokens en heap ===
+[ 1] crear_nodo("if")->lexema      esperado: if           obtenido: if           OK
+[ 2] contar_tokens(3 tokens)       esperado: 3            obtenido: 3            OK
+[ 3] orden: segundo token          esperado: dos          obtenido: dos          OK
+[ 4] ultimo->siguiente == NULL     esperado: 1            obtenido: 1            OK
+[ 5] contar_tokens(NULL)           esperado: 0            obtenido: 0            OK
+[ 6] liberar_lista(NULL)           esperado: sin crash    obtenido: sin crash    OK
 
 RESULTADO: 6/6 pruebas superadas
 TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion02.md
 ```
+
+Ambas implementaciones obtienen el mismo 6/6, pese a que la del modelo contiene un desbordamiento de heap. Los seis casos del harness usan los lexemas `"if"`, `"x"`, `";"`, `"uno"`, `"dos"`, `"a"` y `"b"`: ninguno pasa de tres caracteres, así que el límite de 16 del campo `lexema` nunca llega a tocarse. Ese contraste es el punto de partida de la auditoría que sigue.
 
 Ambas implementaciones obtienen el mismo 6/6, pese a que la del modelo contiene un desbordamiento de heap. Los seis casos del harness usan los lexemas `"if"`, `"x"`, `";"`, `"uno"`, `"dos"`, `"a"` y `"b"`: ninguno pasa de tres caracteres, así que el límite de 16 del campo `lexema` nunca llega a tocarse. Ese contraste es el punto de partida de la auditoría que sigue.
 
