@@ -11,7 +11,19 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Manipulación de archivos y llamadas OS
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
+> Esta sesión tuvo dos partes distintas: un error de compilación que no era mío, y la implementación a mano de las tres funciones.
 >
+> El primer obstáculo apareció antes de escribir una sola línea. Al compilar, GCC rechazó la cabecera con `invalid preprocessing directive #ifdnef; did you mean #ifdef?`, seguido de un `#endif without #if` en la línea 14. Al principio me desconcertó que el error señalara `api_sesion03.h`, que es un archivo que no debía tocar. Leyendo con calma entendí que las dos letras del medio estaban invertidas —decía `#ifdnef` en vez de `#ifndef`— y que el segundo error era consecuencia del primero: sin una directiva de apertura válida, el `#endif` del final quedaba huérfano. Lo corregí y compiló. Me volvió a pasar más tarde, porque el cuaderno se recarga desde el repositorio original cada vez que se abre por enlace, así que la errata reaparece hasta que guardas tu propia copia.
+>
+> De la implementación, lo nuevo fue el manejo de archivos. `fopen` devuelve un `FILE *` que puede ser `NULL` si la apertura falla, igual que `malloc`, así que hay que comprobarlo antes de usarlo. En `contar_lineas` tuve que declarar el carácter leído como `int` y no como `char`: `fgetc` necesita poder devolver `EOF`, que es un valor fuera del rango de los caracteres, y en un `char` no cabría la distinción.
+>
+> El caso borde que más me hizo pensar fue el de la última línea. Contar los `'\n'` parece suficiente, pero con `"a\nb"` da 1 cuando son dos líneas: la última no termina en salto. Lo resolví recordando el último carácter leído en una variable aparte y sumando una línea más si el archivo no estaba vacío y no terminaba en `'\n'`. Son dos condiciones unidas con `&&`.
+>
+> Donde más me trabé fue en la sintaxis de llamada a función, en `ejecutar`. Escribí `system` a secas, luego `(system)` con los paréntesis alrededor del nombre, y después `system()` con los paréntesis vacíos, antes de dar con `system(comando)`. El error era conceptual: los paréntesis no acompañan al nombre, son lo que convierte el nombre en una llamada, y adentro va lo que la función necesita para trabajar.
+>
+> Las macros `WIFEXITED` y `WEXITSTATUS` sí las copié, porque son nombres que no tiene sentido memorizar. Lo que sí entendí es para qué sirven: `system()` no devuelve el código de salida del comando sino un entero empaquetado donde ese código ocupa el byte alto, de modo que `false` daría 256 en lugar de 1 si uno devolviera el valor crudo.
+>
+> Un detalle menor que me corrigieron: puse los `#include <stdlib.h>` y `<sys/wait.h>` en medio del archivo, justo antes de la función que los necesitaba. Compila, porque el preprocesador los inserta donde los encuentra y aparecen antes del primer uso, pero van al principio para que cualquiera vea de qué depende el archivo sin leerlo entero.
 
 ---
 
@@ -147,7 +159,7 @@ int ejecutar(const char *comando) {
 
 ### Ejecución del harness oficial
 
-El código del modelo compila sin una sola advertencia y supera los seis casos a la primera:
+Contra la implementación propia de la Fase 1:
 
 ```
 === AUDITORIA SESION 03 - Archivos y codigos de salida ===
@@ -162,7 +174,22 @@ RESULTADO: 6/6 pruebas superadas
 TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion03.md
 ```
 
-El modelo manejó correctamente las dos trampas previsibles: contó la última línea aunque no termine en `'\n'`, y extrajo el código de salida con `WEXITSTATUS` en lugar de devolver el valor crudo de `system()`. También comprobó los punteros nulos, verificó `fputs` contra `EOF` y cerró el archivo antes de salir por error.
+Contra el código devuelto por la IA, que compila sin una sola advertencia y supera los seis casos a la primera:
+
+```
+=== AUDITORIA SESION 03 - Archivos y codigos de salida ===
+[ 1] escribir_texto(...)==0             esperado: 0            obtenido: 0            OK
+[ 2] contar_lineas(3 lineas)            esperado: 3            obtenido: 3            OK
+[ 3] contar_lineas(sin salto final)     esperado: 2            obtenido: 2            OK
+[ 4] contar_lineas(inexistente)         esperado: -1           obtenido: -1           OK
+[ 5] ejecutar("true")                   esperado: 0            obtenido: 0            OK
+[ 6] ejecutar("false")                  esperado: 1            obtenido: 1            OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion03.md
+```
+
+Las dos implementaciones aprueban por igual. El modelo manejó correctamente las dos trampas previsibles: contó la última línea aunque no termine en `'\n'`, y extrajo el código de salida con `WEXITSTATUS` en lugar de devolver el valor crudo de `system()`. También comprobó los punteros nulos, verificó `fputs` contra `EOF` y cerró el archivo antes de salir por error.
 
 Un 6/6 con el código limpio deja la auditoría en su caso más difícil: hay que buscar lo que las pruebas no miden. Construí tres casos que el harness no contempla.
 
