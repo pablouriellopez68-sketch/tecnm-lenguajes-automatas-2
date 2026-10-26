@@ -1,10 +1,10 @@
 # Bitácora de Requerimientos y Auditoría IA — Sesión 03
-**Materia:** Lenguajes y Autómatas II (SCD-1016)  
-**Tema:** Google Colab, Mágicos y Flujo de Entrega  
-**Docente Titular:** MCC. Iván Márquez Larios (`ijmarquezl`)  
-**Estudiante:** [Nombre Completo]  
-**Matrícula:** [No. de Control]  
-**Track:** [ C | Rust ]  
+**Materia:** Lenguajes y Autómatas II (SCD-1016)
+**Tema:** Google Colab, Mágicos y Flujo de Entrega
+**Docente Titular:** MCC. Iván Márquez Larios (`ijmarquezl`)
+**Estudiante:** Pablo Uriel Desiderio López
+**Matrícula:** 24531372
+**Track:** C
 
 ---
 
@@ -27,14 +27,79 @@
 
 ### 2.2 Prompt Estructurado
 ```text
-[Pega aquí el prompt formal que redactaste para la IA]
+### 2.2 Prompt Estructurado
+```text
+[CONTEXTO]
+Estándar C11 compilado con GCC usando -std=c11 -Wall -Wextra -Werror.
+Cualquier advertencia cuenta como error. Entorno Linux.
+
+[ROL]
+Actúa como ingeniero de software de sistemas y compiladores.
+
+[ESPECIFICACIÓN]
+Implementa exactamente este contrato, sin alterar ninguna firma:
+
+    int escribir_texto(const char *ruta, const char *texto);
+    int contar_lineas(const char *ruta);
+    int ejecutar(const char *comando);
+
+- `escribir_texto` crea o sobrescribe el archivo y escribe el texto.
+  Devuelve 0 en éxito.
+- `contar_lineas` devuelve el número de líneas del archivo.
+- `ejecutar` lanza el comando y devuelve su código de salida.
+- Un archivo inexistente se reporta devolviendo -1, sin abortar el
+  programa.
+- Los archivos abiertos deben cerrarse siempre.
+- El archivo no debe contener main().
+
+[OUTPUT]
+Entrega únicamente el código C y el análisis de complejidad.
+No incluyas explicación en prosa fuera de los comentarios del código.
 ```
 
 ---
 
 ## 3. Código Devuelto por el Modelo
 ```c
-// Código devuelto por el LLM
+#include "api_sesion03.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+int escribir_texto(const char *ruta, const char *texto)
+{
+    FILE *f = fopen(ruta, "w");
+    if (f == NULL) {
+        return -1;
+    }
+    fputs(texto, f);
+    fclose(f);
+    return 0;
+}
+
+int contar_lineas(const char *ruta)
+{
+    FILE *f = fopen(ruta, "r");
+    if (f == NULL) {
+        return -1;
+    }
+    int lineas = 0;
+    int c;
+    while ((c = fgetc(f)) != EOF) {
+        if (c == '\n') {
+            lineas++;
+        }
+    }
+    fclose(f);
+    return lineas;
+}
+
+int ejecutar(const char *comando)
+{
+    return system(comando);
+}
+```
+
+**Complejidad declarada por el modelo:** `escribir_texto` O(n) sobre la longitud del texto; `contar_lineas` O(n) sobre el tamaño del archivo, con O(1) de memoria auxiliar al leer carácter por carácter; `ejecutar` depende del comando invocado.
 ```
 
 ---
