@@ -11,12 +11,14 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Impresión en Postorden / RPN  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> El recorrido en sí es sencillo (izquierdo → derecho → raíz), pero la dificultad está en que la función **no imprime**: tiene que escribir en un buffer de tamaño fijo `cap`. Eso obligó a resolver tres cosas a mano:
-> 1. **Separadores:** el espacio va *antes* de cada token salvo el primero (`strlen(buf) > 0`); si lo pones después queda un espacio final y el harness falla por comparación exacta.
-> 2. **Capacidad:** nunca escribir más de `cap-1` caracteres más el `'\0'`. Calculo `libre = cap - 1 - usado` y solo escribo si el token completo (con su espacio) cabe.
-> 3. **Convertir el nodo a texto:** los números son `int` y los operadores `char`, así que uso `snprintf` a un buffer temporal `tok[16]` (un `int` de 32 bits ocupa como máximo 11 caracteres con signo).
+> Intenté escribirlo a mano, pero me atoré en la estructura: no sabía cómo separar la recursión de la función `postorden`. Por eso pedí a la IA que me guiara paso a paso y yo fui escribiendo cada línea en la celda. Los errores que cometí en el camino fueron:
+> - Puse la función `recorrer` dentro de `postorden`. En C no se pueden meter funciones dentro de otras, y además `recorrer` tiene que ir antes porque `postorden` la llama.
+> - Llamé primero a `n->der` y luego a `n->izq`. Así me habría salido `3 8 -` en lugar de `8 3 -`, porque el postorden es izquierdo, derecho y al final la raíz.
+> - Escribí `| |` con un espacio en medio en vez de `||`.
+> - Puse dos espacios dentro de `strcat(buf, "  ")`. Como el harness compara el texto exacto, todos los casos habrían fallado.
+> - El compilador me marcó `-Werror=misleading-indentation` porque el `if` del paso final quedó con sangría, como si fuera parte del `else`. El código estaba bien, pero con `-Werror` cualquier advertencia es error.
 >
-> Además, `postorden` debe dejar `buf[0] = '\0'` antes de recorrer para que un árbol `NULL` produzca cadena vacía.
+> La restricción más importante fue que la función no puede imprimir: tiene que escribir en un buffer de tamaño `cap` y siempre dejar un lugar para el `'\0'`. Por eso, antes de agregar cada token, reviso que quepa contando el espacio separador, y el espacio solo lo pongo si ya hay algo escrito, para que no quede uno al inicio ni al final.
 
 ---
 
@@ -108,6 +110,8 @@ void postorden(ASTNode *n, char *buf, int cap) {
 *Pruebas ejecutadas:* Validación contra desbordamiento de pila
 
 ### Salida del harness
+
+**Versión artesano** (`artesano_sesion05_c.c`):
 ```text
 === AUDITORIA SESION 05 - Recorrido postorden y RPN ===
 Caso                               esperado:              obtenido:              resultado
@@ -124,7 +128,24 @@ RESULTADO: 5/5 pruebas superadas
 TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion05.md
 ```
 
-Ambas versiones (artesano e IA) obtienen 5/5 con `-Wall -Wextra -Werror`.
+**Versión IA** (`ia_sesion05_c.c`):
+```text
+=== AUDITORIA SESION 05 - Recorrido postorden y RPN ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] hoja 42                            esperado: 42           obtenido: 42           OK
+[ 2] 3+(5*2)                            esperado: 3 5 2 * +    obtenido: 3 5 2 * +    OK
+[ 3] arbol NULL                         esperado:              obtenido:              OK
+[ 4] (1+2)*(3+4)
+     esperado: 1 2 + 3 4 + *
+     obtenido: 1 2 + 3 4 + *
+     -> OK
+[ 5] 8-3                                esperado: 8 3 -        obtenido: 8 3 -        OK
+
+RESULTADO: 5/5 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion05.md
+```
+
+Las dos versiones obtienen 5/5 con `-Wall -Wextra -Werror`.
 
 * [x] Caso base y límites superados sin *Crash*.
 * [x] No existen accesos fuera de límites ni *Memory Leaks*.
@@ -134,10 +155,25 @@ Ambas versiones (artesano e IA) obtienen 5/5 con `-Wall -Wextra -Werror`.
 
 ### Reporte Crítico
 *¿Qué caso borde o problema omitió la IA y cómo lo solucionaste?*
-> El harness solo usa buffers de 16 a 64 bytes, donde todo cabe, así que el código de la IA pasa 5/5. El problema aparece cuando el buffer es **más chico que la salida**: la IA trunca con `snprintf` a mitad de token. Con el árbol `123 + (-45)`:
+> El harness solo usa buffers de 16 a 64 bytes, donde todo cabe, así que las dos versiones pasan 5/5. Hice una prueba extra fuera del harness con el árbol `123 + (-45)` y buffers chicos, compilada con `-fsanitize=address,undefined`:
 >
-> | cap | IA | Artesano (corregido) |
+> | cap | IA | Mi versión (artesano) |
 > | :-: | :--- | :--- |
+> | 2 | `"1"` | `"+"` |
+> | 5 | `"123 "` | `"123"` |
+> | 7 | `"123 -4"` | `"123 +"` |
+> | 9 | `"123 -45 "` | `"123 -45"` |
+> | 10 | `"123 -45 +"` | `"123 -45 +"` |
+>
+> **Lo que omitió la IA:** cuando el buffer no alcanza, `snprintf` corta a mitad de token. Con `cap = 5` y `cap = 9` deja un **espacio final**, aunque el prompt pedía explícitamente "sin espacio final". Con `cap = 7` escribe `-4` en lugar de `-45`, un número equivocado. No hay desbordamiento (AddressSanitizer no reporta nada), pero la salida es incorrecta.
+>
+> **Lo que la prueba también encontró en mi versión:** no deja espacios ni tokens cortados, porque solo escribe un token si cabe completo. Pero si un token no cabe, lo salta y sigue con los siguientes, así que con `cap = 7` produce `"123 +"`, una RPN falsa a la que le falta el `-45`.
+>
+> **Solución:** en cuanto un token no quepa, hay que dejar de escribir por completo (por ejemplo, con una bandera `lleno` que se pasa por la recursión). Así el buffer solo contendría un prefijo correcto del recorrido: `"123"` con `cap = 7`.
+>
+> **Observación adicional:** con números negativos, el token `-45` se puede confundir con el operador `-`. El harness no prueba negativos.
+
+--- | :--- |
 > | 2 | `"1"` | `""` |
 > | 5 | `"123 "` | `"123"` |
 > | 7 | `"123 -4"` | `"123"` |
