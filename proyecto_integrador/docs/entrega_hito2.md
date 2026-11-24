@@ -1,4 +1,4 @@
-# Entrega · Hito 1
+# Entrega · Hito 2
 
 **Equipo:**
 - Juan Pablo Alvarado Martinez
@@ -15,7 +15,7 @@
 
 ## 1. Qué funciona
 
-Hito 1: léxico, sintaxis y AST de expresiones.
+Hito 2: sentencias, tabla de símbolos con ámbitos y diagnósticos (incluye lo del Hito 1).
 
 ```bash
 make clean && make
@@ -29,7 +29,6 @@ make test-hito2
 ```
 
 make compila todos los src/*.c y src/*.h con -std=c11 -Wall -Wextra -Werror -O2 generando el binario lenguajito sin advertencias.
-
 --tokens (modo_tokens en compilador.c + lexer.c) imprime linea:columna TIPO lexema por token y linea:columna EOF al final, reportando errores léxicos S01.
 
 --ast (parser.c + ast.c) construye el árbol sintáctico con precedencia de operadores, lo imprime en una línea con ast_imprimir y libera la memoria con ast_liberar.
@@ -39,7 +38,6 @@ make compila todos los src/*.c y src/*.h con -std=c11 -Wall -Wextra -Werror -O2 
 --run (interprete.c, conectado en compilador.c) ejecuta el AST tras validar sintaxis y semántica, manejando ámbitos (push_scope / pop_scope), shadowing, evaluación de expresiones y sentencias (if, else, while, print).
 
 --tac (tac.c, conectado en compilador.c) genera código de tres direcciones con temporales _t0, _t1, ..., etiquetas L1, L2, ..., saltos (goto, ifFalso) y plegado de constantes (plegar).
-```
 
 ## 2. Qué no funciona (y por qué)
 
@@ -49,7 +47,7 @@ make compila todos los src/*.c y src/*.h con -std=c11 -Wall -Wextra -Werror -O2 
 
 ## 3. Pruebas
 
-Salida de `make test-hito1`:
+Salida de `make test-hito2`:
 
 ```text
 python3 tests/run.py --hito2
@@ -57,21 +55,22 @@ python3 tests/run.py --hito2
 Hito 2: 14/14 pruebas superadas
 ```
 
-Pruebas propias en `tests/propias/` (7 casos + runner `run_propias.py`; la carpeta `tests/` del curso no se modificó):
+Pruebas propias en `tests/propias/` (12 casos + runner `run_propias.py`; la carpeta `tests/` del curso no se modificó). Salida de `python3 tests/propias/run_propias.py`: `Pruebas propias: 12/12 superadas`.
 
-tests/propias/01_precedencia: precedencia de operadores (* antes que +).
-
-tests/propias/02_comparacion: operadores de comparación en el AST.
-
-tests/propias/03_sin_expresion: error de sintaxis cuando falta una expresión (.err).
-
-tests/propias/04_asociatividad: asociatividad de operadores del mismo nivel.
-
-tests/propias/05_unario: operadores unarios.
-
-tests/propias/06_parentesis: agrupación con paréntesis.
-
-tests/propias/07_sin_init: declaración sin inicializador.
+| Archivo | Qué cubre |
+| :--- | :--- |
+| `01_precedencia` | Precedencia de operadores (`*` antes que `+`) |
+| `02_comparacion` | Operadores de comparación en el AST |
+| `03_sin_expresion` | Error de sintaxis cuando falta una expresión (`.err`) |
+| `04_asociatividad` | Asociatividad de operadores del mismo nivel |
+| `05_unario` | Operadores unarios |
+| `06_parentesis` | Agrupación con paréntesis |
+| `07_sin_init` | Declaración sin inicializador |
+| `08_bloques_anidados` | Bloques anidados dentro de un `if` (AST) |
+| `09_ambito_fuera` | Usar una variable fuera de su bloque → `E01` en la línea 6 |
+| `10_redeclaracion_bloque` | Redeclaración dentro del mismo bloque → `E02` |
+| `11_div_cero_bloque` | División entre cero constante dentro de un `if` → `E04` |
+| `12_shadowing` | Una variable interna oculta a la externa y al salir se recupera (`2` y luego `1`) |
 
 ## 4. Reparto de trabajo
 
