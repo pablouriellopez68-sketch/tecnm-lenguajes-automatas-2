@@ -11,7 +11,13 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Integración AST y Tipado Estático  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion10_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Lo primero fue entender por qué son tres funciones: `expr` maneja `+` y `-`, `termino` maneja `*` y `/`, y `primaria` lee un número o un paréntesis. Como `expr` le pide a `termino` cada lado, la multiplicación se resuelve antes que la suma, y así `2+3*4` da 14 y no 20.
+>
+> En `primaria` aprendí que el carácter `'7'` no es el número 7: hay que restarle `'0'`, y el número se arma dígito por dígito con `v * 10 + dígito`. También que dentro de un paréntesis hay que volver a llamar a `expr`, porque ahí puede venir una expresión completa.
+>
+> En `expr` me equivoqué al escribir la suma y la resta: mezclé un `if` con el operador `? :` y quedó `v = ? v + d : v - d`, que no es válido. Lo cambié por un `if` / `else` normal.
+>
+> Lo que más me costó fue Colab: al pegar el código se cortó a la mitad, el compilador marcó `expected identifier or '(' at end of input` (el archivo se acababa en medio de `termino`) y el editor pintaba llaves en rojo. Tuve que borrar la parte incompleta y pegar las funciones que faltaban hasta que la celda terminara en la llave de `evaluar_expresion`.
 
 ---
 
@@ -149,14 +155,25 @@ long evaluar_expresion(const char *fuente, int *error) {
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion10_c.c artesano_sesion10_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 10 - Mini-evaluador de expresiones (Hito 1) ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] "2+3*4"                            esperado: 14           obtenido: 14           OK
+[ 2] "(2+3)*4"                          esperado: 20           obtenido: 20           OK
+[ 3] "10/0" -> error 1                  esperado: 1            obtenido: 1            OK
+[ 4] "2+" -> error 2                    esperado: 2            obtenido: 2            OK
+[ 5] "  7 "                             esperado: 7            obtenido: 7            OK
+[ 6] "5-10"                             esperado: -5           obtenido: -5           OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion10.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 10 - Mini-evaluador de expresiones (Hito 1) ===
