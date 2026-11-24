@@ -15,7 +15,7 @@
 >
 > Lo que más me costó fue Colab, no el código. Primero el harness daba `0/4` con el texto vacío porque yo no había cambiado el esqueleto, que solo hace `salida[0] = '\0'`. Luego, por error, edité la celda de `api_sesion09.h` en lugar de la del artesano y borré la declaración de `reportar`. Tuve que restaurarla con todos sus parámetros. Aprendí a fijarme en la primera línea de cada celda (`%%writefile api_...` contra `%%writefile artesano_...`) y a volver a correrla después de cambiarla.
 >
-> Mi versión quedó igual a la de la IA, lo cual tiene sentido porque con `snprintf` el ejercicio casi tiene una sola forma de escribirse.
+
 
 ---
 
