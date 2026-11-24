@@ -17,7 +17,7 @@
 >
 > En `expr` me equivoqué al escribir la suma y la resta: mezclé un `if` con el operador `? :` y quedó `v = ? v + d : v - d`, que no es válido. Lo cambié por un `if` / `else` normal.
 >
-> Lo que más me costó fue Colab: al pegar el código se cortó a la mitad, el compilador marcó `expected identifier or '(' at end of input` (el archivo se acababa en medio de `termino`) y el editor pintaba llaves en rojo. Tuve que borrar la parte incompleta y pegar las funciones que faltaban hasta que la celda terminara en la llave de `evaluar_expresion`.
+
 
 ---
 
