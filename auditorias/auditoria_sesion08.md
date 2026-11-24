@@ -11,7 +11,13 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Reglas de casteo implícito  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion08_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Al principio no sabía cómo saber cuál tipo era "más ancho", hasta que vi en la cabecera que el `enum` ya trae números en orden (`CHAR = 1`, `INT = 2`, `FLOAT = 3`) y que se pueden comparar directo con `>` y `<`.
+>
+> En `promover` me equivoqué en la segunda línea: puse `return b` en los dos casos, y así la función siempre devolvía el segundo tipo aunque el primero fuera más grande. Me di cuenta al probarlo en mi cabeza con `promover(FLOAT, CHAR)`, que regresaba `char` en lugar de `float`.
+>
+> En `hay_perdida` no sabía qué poner en la comparación. Primero escribí `TIPO_ERROR` y luego `a`, hasta que entendí que ahí va un operador. Hay pérdida cuando el destino es **más chico** que el origen, o sea `destino < origen`, como vaciar una jarra en un vaso.
+>
+> También aprendí que el esqueleto pasaba el caso 6 desde el principio, pero solo porque siempre devolvía 0, no porque estuviera bien.
 
 ---
 
@@ -103,14 +109,25 @@ const char *nombre_tipo(Tipo t) {
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion08_c.c artesano_sesion08_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 08 - Reglas de promocion y perdida ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] promover(CHAR,INT)                 esperado: int          obtenido: int          OK
+[ 2] promover(INT,FLOAT)                esperado: float        obtenido: float        OK
+[ 3] promover(FLOAT,FLOAT)              esperado: float        obtenido: float        OK
+[ 4] promover(ERROR,INT)                esperado: error        obtenido: error        OK
+[ 5] hay_perdida(CHAR,INT)              esperado: 1            obtenido: 1            OK
+[ 6] hay_perdida(INT,CHAR)              esperado: 0            obtenido: 0            OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion08.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 08 - Reglas de promocion y perdida ===
