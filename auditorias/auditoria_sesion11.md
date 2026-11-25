@@ -11,7 +11,13 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Tabla Hash con encadenamiento  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion11_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> `hash_djb2` fue directa porque la receta venía en el `TODO`: empezar en 5381 y en cada letra multiplicar por 33 y sumar el carácter. Lo que entendí es que el número que sale, con `% cubetas`, decide en qué cubeta va cada símbolo.
+>
+> En `insertar_simbolo` lo más importante fue el orden. Primero rechazar datos inválidos (-1), luego revisar si el nombre ya existe en **todas** las cubetas, no solo en la suya (0), y hasta el final crear el nodo con `malloc`. También me di cuenta de que para usar `malloc` necesitaba agregar `#include <stdlib.h>`, porque el esqueleto no lo traía.
+>
+> Me equivoqué en una línea: escribí `nuevo->offset = nuevo;`, o sea, le asigné el puntero al nodo en lugar del parámetro `offset`. Lo confundí porque las dos cosas se llaman parecido. Lo corregí a `nuevo->offset = offset;`.
+>
+> Lo que más me costó entender fue el encadenamiento: el nodo nuevo apunta al que ya estaba en la cubeta (`nuevo->sig = tabla[idx]`) y luego pasa a ser el primero. Así, cuando dos nombres caen en la misma cubeta, ninguno se pierde.
 
 ---
 
@@ -109,14 +115,25 @@ int insertar_simbolo(Simbolo *tabla[], unsigned int cubetas, const char *nombre,
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion11_c.c artesano_sesion11_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 11 - Tabla hash con encadenamiento ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] hash_djb2("")                      esperado: 5381         obtenido: 5381         OK
+[ 2] hash_djb2("abc")                   esperado: 193485963    obtenido: 193485963    OK
+[ 3] insertar x dos veces               esperado: 0            obtenido: 0            OK
+[ 4] dos claves, una cubeta             esperado: 2            obtenido: 2            OK
+[ 5] offset de beta en cadena           esperado: 4            obtenido: 4            OK
+[ 6] insertar en tabla NULL             esperado: -1           obtenido: -1           OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion11.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 11 - Tabla hash con encadenamiento ===
