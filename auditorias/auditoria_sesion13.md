@@ -11,7 +11,11 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Pila de tablas de símbolos (Stack Scopes)  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion13_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Esta sesión me salió sin errores de compilación. Lo que me costó fue entender la idea antes de escribirla: cada ámbito (global, función, bloque) tiene su propia lista de nombres y un puntero `padre` al ámbito que lo contiene.
+>
+> En `declarar` entendí por qué **no** hay que revisar los padres: el mismo nombre puede existir una vez en cada nivel, como una `x` global y otra `x` dentro de un `if`. También importa el orden de las revisiones: primero ver si el nombre ya está (0) y después si el ámbito está lleno (-1). Además, `nombre[0] == '\0'` sirve para detectar un nombre vacío.
+>
+> En `buscar` lo clave fue el `for` que sube con `a = a->padre` hasta llegar a `NULL`, que es la raíz. Al principio no tenía claro qué devolver: la función regresa el **nombre del ámbito** donde encontró la variable (`a->nombre`), no el de la variable. Por eso el caso de shadowing devuelve `bloque`, porque la `x` de adentro tapa a la de afuera y se encuentra primero.
 
 ---
 
@@ -98,14 +102,25 @@ const char *buscar(const Ambito *ambito, const char *nombre) {
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion13_c.c artesano_sesion13_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 13 - Pila de ambitos y busqueda jerarquica ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] declarar(&g, "x")                  esperado: 1            obtenido: 1            OK
+[ 2] buscar en el mismo ambito          esperado: global       obtenido: global       OK
+[ 3] buscar subiendo al padre           esperado: global       obtenido: global       OK
+[ 4] shadowing en el hijo               esperado: bloque       obtenido: bloque       OK
+[ 5] tres niveles hasta la raiz         esperado: raiz         obtenido: raiz         OK
+[ 6] nombre no declarado                esperado: (nulo)       obtenido: (nulo)       OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion13.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 13 - Pila de ambitos y busqueda jerarquica ===
