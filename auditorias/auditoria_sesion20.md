@@ -4,14 +4,18 @@
 **Docente Titular:** MCC. Iván Márquez Larios (`ijmarquezl`)  
 **Estudiante:** Pablo Uriel Desiderio López  
 **Matrícula:** 24531372  
-**Track:** C (el harness evalúa C; la versión en Rust es opcional y no se califica con este harness)  
+**Track:** C  
 
 ---
 
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Integración de Tabla de Símbolos y AST  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion20_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> `profundidad_de` es como `buscar` de la sesión 13, pero en lugar del nombre del ámbito devuelve cuántos niveles subí. Me equivoqué al contar: puse `nivel++` en el `for` y otra vez dentro del ciclo, así que los niveles salían de 2 en 2. Luego, al quitarlo, dejé `nivel+` con un solo `+`, que no compila. Al final dejé un solo `nivel++`, dentro del ciclo.
+>
+> Lo que más me costó fue `contar_visibles`, porque la misma variable puede estar en dos ámbitos y solo debe contarse una vez. La idea que usé es reutilizar `profundidad_de`: un nombre se ve desde el ámbito actual solo si `profundidad_de` lo encuentra en el mismo nivel donde está. Si una `x` está en el nivel 2 pero `profundidad_de` la encuentra en el 0, es porque otra `x` más adentro la tapa, y no se cuenta.
+>
+> Primero comparé contra `0` en lugar de `nivel`, y así contaba la `x` dos veces y se olvidaba de las demás. Después cambié por error `cuenta++` por `nivel++`. La línea correcta es `if (profundidad_de(actual, a->simbolos[i]) == nivel) cuenta++;`. También se me olvidó la última llave de la función. Mi versión quedó más corta que la de la IA, que usa tres ciclos anidados para lo mismo.
 
 ---
 
@@ -110,14 +114,25 @@ int contar_visibles(const Ambito *actual) {
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion20_c.c artesano_sesion20_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 20 - Resolucion de nombres y visibilidad ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] nombre en el ambito actual         esperado: 0            obtenido: 0            OK
+[ 2] nombre dos niveles arriba          esperado: 2            obtenido: 2            OK
+[ 3] shadowing gana el interno          esperado: 0            obtenido: 0            OK
+[ 4] nombre no visible                  esperado: -1           obtenido: -1           OK
+[ 5] visibles sin repetir               esperado: 3            obtenido: 3            OK
+[ 6] ambito NULL                        esperado: -2           obtenido: -2           OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion20.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 20 - Resolucion de nombres y visibilidad ===
