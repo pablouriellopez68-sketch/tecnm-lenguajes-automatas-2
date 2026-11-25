@@ -11,7 +11,11 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Detección de variables no declaradas  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion14_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> `usar` me salió directo: recorrer la tabla con `strcmp` y regresar 1 solo si encuentra el nombre exacto. Por eso `"x"` y `"xy"` cuentan como distintos, porque `strcmp` compara el texto completo y no solo el principio.
+>
+> Lo que más me costó fue la revisión de tabla llena en `declarar`. Primero escribí `tabla->total >= nombre`, comparando un número con un texto. Luego probé con `0` y con `-1`, pero con esos la condición siempre es verdadera y la función nunca insertaba nada. Al final entendí que ahí va el límite de la tabla, `TABLA_MAX`, que está definido en la cabecera como 16, y que el `-1` es lo que se **devuelve**, no el límite.
+>
+> Me quedó claro que sin esa revisión, la declaración número 17 escribiría fuera del arreglo. El enunciado no lo menciona en las viñetas, pero viene en la cabecera, y la versión de la IA no lo revisa.
 
 ---
 
@@ -94,14 +98,25 @@ int usar(const Tabla *tabla, const char *nombre) {
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion14_c.c artesano_sesion14_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 14 - Declaracion previa y redeclaracion ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] usar sin declarar                  esperado: 0            obtenido: 0            OK
+[ 2] usar despues de declarar           esperado: 1            obtenido: 1            OK
+[ 3] redeclarar el mismo nombre         esperado: 0            obtenido: 0            OK
+[ 4] total tras redeclarar              esperado: 1            obtenido: 1            OK
+[ 5] prefijo no es el mismo nombre      esperado: 0            obtenido: 0            OK
+[ 6] declarar nombre vacio              esperado: -1           obtenido: -1           OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion14.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 14 - Declaracion previa y redeclaracion ===
