@@ -11,7 +11,11 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Registro de prototipos y aridad  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion16_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Lo que más me costó fueron los códigos de regreso. Hay tres respuestas posibles: 1 si la función existe y la cantidad de argumentos coincide, 0 si existe pero con otra cantidad, y -1 si no existe o los datos son inválidos. Varias veces los puse al revés, por ejemplo regresando 0 cuando todo coincidía o -1 cuando la función sí existía. Hasta que hice una tabla de qué significa cada número dejé de confundirme.
+>
+> También me confundí con `strcmp`: escribí `== 1` pensando que 1 significa "son iguales", pero `strcmp` devuelve **0** cuando los dos textos son iguales. Entonces hay dos ceros distintos en la función: el de `strcmp(...) == 0`, que significa "mismo nombre", y el de `return 0`, que significa "existe pero con otra aridad".
+>
+> Lo que sí entendí bien es por qué se usa la variable `encontrada`: el contrato pide recorrer el catálogo completo, porque puede haber dos firmas con el mismo nombre. Si regreso en cuanto encuentro el nombre, podría rechazar una llamada válida, y eso es justo lo que hace la versión de la IA.
 
 ---
 
@@ -86,14 +90,25 @@ int verificar_llamada(const Funcion *catalogo, int total, const char *nombre, in
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion16_c.c artesano_sesion16_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 16 - Registro de prototipos y aridad ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] suma con 3 argumentos              esperado: 1            obtenido: 1            OK
+[ 2] suma con 2 argumentos              esperado: 0            obtenido: 0            OK
+[ 3] suma con 4 argumentos              esperado: 0            obtenido: 0            OK
+[ 4] funcion no registrada              esperado: -1           obtenido: -1           OK
+[ 5] main sin argumentos                esperado: 1            obtenido: 1            OK
+[ 6] nombre NULL                        esperado: -1           obtenido: -1           OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion16.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 16 - Registro de prototipos y aridad ===
