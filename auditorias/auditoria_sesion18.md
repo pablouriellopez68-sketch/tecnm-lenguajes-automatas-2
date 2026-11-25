@@ -4,14 +4,18 @@
 **Docente Titular:** MCC. Iván Márquez Larios (`ijmarquezl`)  
 **Estudiante:** Pablo Uriel Desiderio López  
 **Matrícula:** 24531372  
-**Track:** C (el harness evalúa C; la versión en Rust es opcional y no se califica con este harness)  
+**Track:** C  
 
 ---
 
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Cálculo de tamaño de arreglo en memoria  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion18_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Esta sesión me salió sin errores. Reutilicé la tabla de anchos de la sesión 12 en una función auxiliar `ancho`, y con eso `bytes_arreglo` es solo multiplicar: `int[10]` son 4 × 10 = 40 bytes.
+>
+> Lo que tuve que pensar fue la diferencia entre negativo y cero: un arreglo con elementos negativos no tiene sentido y devuelve -1, pero uno de cero elementos sí es válido y pesa 0 bytes. Por eso la condición es `elementos < 0` y no `<= 0`. También entendí que el `(long)` antes de multiplicar sirve para que un arreglo muy grande no se desborde.
+>
+> En `indice_en_rango` lo clave fue que el índice más alto es `elementos - 1`: en un arreglo de 5 los índices van del 0 al 4, y el 5 ya está fuera. Por eso uso `indice < elementos` y no `<=`. Además aprendí que en C una comparación ya devuelve 1 o 0, así que no necesito un `if`.
 
 ---
 
@@ -94,14 +98,25 @@ int indice_en_rango(int indice, int elementos) {
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion18_c.c artesano_sesion18_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 18 - Tamano de arreglo y limites ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] int[10]                            esperado: 40           obtenido: 40           OK
+[ 2] double[3]                          esperado: 24           obtenido: 24           OK
+[ 3] int[-4]                            esperado: -1           obtenido: -1           OK
+[ 4] indice 0 de 5                      esperado: 1            obtenido: 1            OK
+[ 5] indice 5 de 5                      esperado: 0            obtenido: 0            OK
+[ 6] indice negativo                    esperado: 0            obtenido: 0            OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion18.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 18 - Tamano de arreglo y limites ===
