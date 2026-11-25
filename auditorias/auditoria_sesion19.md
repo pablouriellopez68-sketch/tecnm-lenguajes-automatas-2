@@ -4,14 +4,18 @@
 **Docente Titular:** MCC. Iván Márquez Larios (`ijmarquezl`)  
 **Estudiante:** Pablo Uriel Desiderio López  
 **Matrícula:** 24531372  
-**Track:** C (el harness evalúa C; la versión en Rust es opcional y no se califica con este harness)  
+**Track:** C  
 
 ---
 
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Offsets de miembros en estructuras  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion19_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Esta sesión se parecía a la 12, pero con varios campos seguidos. Para entenderla hice una tabla a mano con `struct { char a; int b; char c; }`: `a` va en 0, el cursor queda en 1, `b` se alinea a 4 y el cursor queda en 8, y `c` va en 8. Usé dos funciones auxiliares: `ancho`, con la tabla de tamaños, y `alinear`, con la misma fórmula de redondeo de la sesión 12.
+>
+> En `offset_campo` lo importante fue el orden dentro del ciclo: primero alinear el cursor al ancho del campo, luego revisar si es el que busco (y en ese caso regresar el cursor como su offset), y hasta después sumar lo que ocupa.
+>
+> En `tamano_struct` lo nuevo fue el redondeo final: el tamaño del struct completo tiene que ser múltiplo de su campo más grande. En el ejemplo el cursor termina en 9, pero como el campo más grande es `int` (4), el tamaño real es 12. Para eso guardo el ancho mayor en la variable `mayor`. Al principio escribí `return total;` para el struct vacío, que funciona porque `total` vale 0, pero lo cambié a `return 0;` porque se entiende mejor. También rechazo un `total` negativo, que no tiene sentido.
 
 ---
 
@@ -119,14 +123,25 @@ int tamano_struct(const Campo *campos, int total) {
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion19_c.c artesano_sesion19_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 19 - Offsets de miembros y tamano de struct ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] struct char e int: b               esperado: 4            obtenido: 4            OK
+[ 2] struct de tres campos: c           esperado: 8            obtenido: 8            OK
+[ 3] tamano total con padding           esperado: 12           obtenido: 12           OK
+[ 4] double seguido de char             esperado: 16           obtenido: 16           OK
+[ 5] miembro inexistente                esperado: -1           obtenido: -1           OK
+[ 6] struct sin campos                  esperado: 0            obtenido: 0            OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion19.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 19 - Offsets de miembros y tamano de struct ===
