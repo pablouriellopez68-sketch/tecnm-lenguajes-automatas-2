@@ -11,7 +11,11 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Validación de tipo de sentencia return  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion17_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Esta sesión me salió sin errores, pero tuve que entender el orden de las revisiones antes de escribirla: primero los datos incoherentes (-1), después el tipo (1) y al final las rutas sin `return` (2). Si cambio el orden, una función con datos malos podría reportarse como error de tipo.
+>
+> Para comparar tipos usé una función auxiliar `rango` que le da un número a cada tipo, de `char` = 1 a `double` = 6. Es error cuando la función es más angosta que lo que devuelve, o sea `rango(funcion) < rango(expresion)`: una función `int` no puede devolver un `double`, pero una `double` sí acepta un `int`.
+>
+> Lo que más me costó fue el caso de `void`. Con las variables `f_void` y `e_void`, la condición `f_void != e_void` detecta cuando **uno** es `void` y el otro no, en los dos sentidos: una función `void` que devuelve un valor, y también una función `int` que devuelve algo `void`. Además rechazo `rutas_con_return` negativo, porque no tiene sentido tener menos de cero `return`.
 
 ---
 
@@ -96,14 +100,25 @@ int diagnosticar_retorno(const char *tipo_funcion, const char *tipo_expresion, i
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion17_c.c artesano_sesion17_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 17 - Validacion de retornos y rutas ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] int con int y dos rutas            esperado: 0            obtenido: 0            OK
+[ 2] void devuelve valor                esperado: 1            obtenido: 1            OK
+[ 3] ruta sin retorno                   esperado: 2            obtenido: 2            OK
+[ 4] double acepta int                  esperado: 0            obtenido: 0            OK
+[ 5] int no acepta double               esperado: 1            obtenido: 1            OK
+[ 6] cero rutas de ejecucion            esperado: -1           obtenido: -1           OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion17.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 17 - Validacion de retornos y rutas ===
