@@ -11,7 +11,13 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Operaciones Push y Pop de ámbito  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion15_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Esta sesión me salió sin errores, pero tuve que entender bien la memoria dinámica. El esqueleto no traía `#include <stdlib.h>`, y lo agregué porque `malloc` y `free` vienen de ahí.
+>
+> En `push_ambito` lo clave fue `nuevo->padre = actual`: el ámbito nuevo guarda de dónde vino, y por eso después se puede regresar. La función devuelve `nuevo` porque ahora ese es el ámbito actual, como cuando el compilador entra a un `{`.
+>
+> En `pop_ambito` lo que más me costó fue el orden: primero hay que guardar el padre en una variable y **después** hacer `free(actual)`. Si libero primero, ya no puedo leer `actual->padre`, porque esa memoria ya no es mía.
+>
+> También entendí por qué la raíz no se libera: no la creó `push`, así que no tiene un `malloc` que le corresponda. Se reconoce porque su `padre` es `NULL`, y en ese caso `pop` devuelve `NULL` sin tocar nada.
 
 ---
 
@@ -94,14 +100,25 @@ Ambito *pop_ambito(Ambito *actual) {
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion15_c.c artesano_sesion15_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 15 - Push y pop de ambitos ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] nombre del ambito nuevo            esperado: if           obtenido: if           OK
+[ 2] profundidad con dos push           esperado: 3            obtenido: 3            OK
+[ 3] pop devuelve el padre              esperado: 1            obtenido: 1            OK
+[ 4] pop sobre la raiz                  esperado: 1            obtenido: 1            OK
+[ 5] push con padre NULL                esperado: 1            obtenido: 1            OK
+[ 6] profundidad tras pop               esperado: 2            obtenido: 2            OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion15.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 15 - Push y pop de ambitos ===
