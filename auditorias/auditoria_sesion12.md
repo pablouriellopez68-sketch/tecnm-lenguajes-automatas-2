@@ -11,7 +11,13 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Estructura de registro de símbolos  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion12_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> `ancho_de_tipo` fue una tabla con `strcmp`: char = 1, short = 2, int y float = 4, double y puntero = 8, y cualquier otro tipo devuelve -1. Me equivoqué en una cosa simple: se me olvidó el punto y coma después de `return 8` en la línea de `double`. Sin él, el compilador cree que la instrucción sigue en la línea de abajo.
+>
+> Lo que más me costó entender fue la alineación: cada tipo solo puede empezar en una posición que sea múltiplo de su tamaño. Si declaro `char a` y luego `int b`, el cursor queda en 1, pero el `int` no puede empezar ahí y tiene que brincar hasta 4. Por eso hay bytes de relleno que no se usan.
+>
+> La fórmula `(cursor + ancho - 1) / ancho * ancho` la entendí haciendo el ejemplo a mano: `(1 + 3) / 4 * 4 = 4`. Funciona porque la división entera de C corta los decimales, así que redondea hacia arriba al siguiente múltiplo.
+>
+> También me quedó claro qué guardar y qué devolver: en el registro va el offset ya alineado, y la función devuelve dónde empieza el siguiente símbolo, que es el offset más el ancho (`4 + 4 = 8`).
 
 ---
 
@@ -99,14 +105,25 @@ int asignar_offset(Simbolo *simbolo, int cursor) {
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion12_c.c artesano_sesion12_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 12 - Registro de simbolo y offsets alineados ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] ancho_de_tipo("int")               esperado: 4            obtenido: 4            OK
+[ 2] ancho_de_tipo("double")            esperado: 8            obtenido: 8            OK
+[ 3] int en cursor 0                    esperado: 4            obtenido: 4            OK
+[ 4] char e int: offset de b            esperado: 4            obtenido: 4            OK
+[ 5] double desde cursor 4              esperado: 8            obtenido: 8            OK
+[ 6] registro NULL                      esperado: -1           obtenido: -1           OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion12.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 12 - Registro de simbolo y offsets alineados ===
