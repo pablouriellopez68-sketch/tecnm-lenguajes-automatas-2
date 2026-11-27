@@ -11,7 +11,11 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Saltos condicionales y evaluación booleana  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion24_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Esta sesión me salió sin errores, pero tuve que entender el cortocircuito antes de escribir el código. En `a && b`, si `a` es falso ya no importa `b`, porque todo es falso. Por eso se usa `IFFALSE`: si el operando es falso, brinca directo a la salida. En `a || b` es al revés: si `a` es verdadero ya no importa `b`, y por eso se usa `IFTRUE`.
+>
+> Para elegir la palabra usé el operador `? :` que aprendí en la sesión 21: `(op == '&') ? "IFFALSE" : "IFTRUE"`. Así el resto de la función es igual para los dos operadores.
+>
+> También usé `lineas[n++]`, que escribe en la posición `n` y después la aumenta, así la segunda línea cae en `lineas[1]` y al final `n` ya dice cuántas líneas escribí. Cuando `b` es NULL la condición es simple y solo se emite un salto, sin inventar una segunda comparación.
 
 ---
 
@@ -82,14 +86,40 @@ int emitir_condicion(char lineas[][64], int max, const char *a, const char *b, c
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion24_c.c artesano_sesion24_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 24 - Saltos condicionales con cortocircuito ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] a && b (primer salto)
+     esperado: IFFALSE a GOTO L9
+     obtenido: IFFALSE a GOTO L9
+     -> OK
+[ 2] a && b (segundo salto)
+     esperado: IFFALSE b GOTO L9
+     obtenido: IFFALSE b GOTO L9
+     -> OK
+[ 3] a && b (dos saltos)                esperado: 2            obtenido: 2            OK
+[ 4] a || b (primer salto)
+     esperado: IFTRUE a GOTO L9
+     obtenido: IFTRUE a GOTO L9
+     -> OK
+[ 5] a || b (segundo salto)
+     esperado: IFTRUE b GOTO L9
+     obtenido: IFTRUE b GOTO L9
+     -> OK
+[ 6] condicion simple (b NULL)
+     esperado: IFFALSE a GOTO L0
+     obtenido: IFFALSE a GOTO L0
+     -> OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion24.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 24 - Saltos condicionales con cortocircuito ===
