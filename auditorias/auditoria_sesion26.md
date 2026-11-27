@@ -11,7 +11,11 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Instrucciones param, call y return  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion26_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> En esta sesión mi error se repitió dos veces y fue el mismo: confundí el formato de `snprintf` con el valor que lo llena. En los `PARAM` escribí `"PARAM %s", %d`, poniendo `%d` afuera de las comillas como si fuera una variable, cuando ahí iba el argumento (`a1` o `a2`). Luego en `emitir_return` repetí el formato y quedó `"RETURN %s", "RETURN %s", valor`, que hubiera escrito `RETURN RETURN %s` y además el compilador lo marca por tener un argumento de más. Al final entendí la regla: el formato va una sola vez entre comillas, y después de la coma van los valores que reemplazan cada `%s` o `%d`, en el mismo orden.
+>
+> Lo que sí entendí bien es cómo se arma una llamada en TAC: primero un `PARAM` por cada argumento que existe y después el `CALL` con la cantidad real de parámetros. Para eso usé la variable `params`, que solo aumenta cuando de verdad escribo un `PARAM`, así `p()` sin argumentos queda como `CALL p, 0`.
+>
+> También usé `inicio` para guardar dónde estaba `*n` al empezar, y al final regreso `*n - inicio`, que es cuántas líneas agregué. Mi versión escribe los dos `PARAM` uno por uno, mientras que la de la IA mete los argumentos en un arreglo y los recorre con un `for`: hacen lo mismo, pero la mía se lee más directo.
 
 ---
 
@@ -96,14 +100,34 @@ void emitir_return(char *dst, int cap, const char *valor) {
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion26_c.c artesano_sesion26_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 26 - Llamadas, parametros y retorno ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] PARAM x                            esperado: PARAM x      obtenido: PARAM x      OK
+[ 2] PARAM y                            esperado: PARAM y      obtenido: PARAM y      OK
+[ 3] CALL con dos argumentos
+     esperado: _t0 = CALL f, 2
+     obtenido: _t0 = CALL f, 2
+     -> OK
+[ 4] llamada anidada f(g(x))
+     esperado: _t1 = CALL f, 1
+     obtenido: _t1 = CALL f, 1
+     -> OK
+[ 5] CALL sin argumentos
+     esperado: _t0 = CALL p, 0
+     obtenido: _t0 = CALL p, 0
+     -> OK
+[ 6] RETURN con valor                   esperado: RETURN _t0   obtenido: RETURN _t0   OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion26.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 26 - Llamadas, parametros y retorno ===
