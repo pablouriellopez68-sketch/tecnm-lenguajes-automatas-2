@@ -11,7 +11,11 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Traductor de nodos AST a TAC  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion22_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Esta sesión me salió sin errores, pero fue la que más me costó entender, porque usa recursión. La idea es que la función `traducir` se llama a sí misma con cada hijo. Si el nodo es una hoja, solo regresa su nombre (`n->valor`). Si es un operador, primero traduce el hijo izquierdo y el derecho, después pide un temporal nuevo, escribe la línea `_tX = izq op der` y regresa el nombre del temporal.
+>
+> Lo que me ayudó fue seguir a mano el ejemplo `a + b * c`: el `+` traduce primero la `a` (que regresa `"a"`) y luego el `*`, que escribe `_t0 = b * c` y regresa `"_t0"`. Hasta el final el `+` escribe `_t1 = a + _t0`. Por eso la multiplicación sale primero aunque esté a la derecha: el árbol ya trae la precedencia y el postorden la respeta.
+>
+> También aprendí que `%c` en `snprintf` imprime un solo carácter, que es lo que necesitaba para el operador, y que el temporal que regresa cada llamada es lo que conecta una línea con la siguiente.
 
 ---
 
@@ -114,14 +118,37 @@ int generar_tac(const Nodo *raiz, char lineas[][64], int max) {
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion22_c.c artesano_sesion22_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 22 - Traductor de AST a TAC con precedencia ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] a + b * c                          esperado: _t0 = b * c  obtenido: _t0 = b * c  OK
+[ 2] a + b * c (2a linea)
+     esperado: _t1 = a + _t0
+     obtenido: _t1 = a + _t0
+     -> OK
+[ 3] (a + b) * c
+     esperado: _t1 = _t0 * c
+     obtenido: _t1 = _t0 * c
+     -> OK
+[ 4] x * (y - z) + w
+     esperado: _t2 = _t1 + w
+     obtenido: _t2 = _t1 + w
+     -> OK
+[ 5] hoja sin operaciones               esperado: 0            obtenido: 0            OK
+[ 6] (a + b) * (c - d)
+     esperado: _t2 = _t0 * _t1
+     obtenido: _t2 = _t0 * _t1
+     -> OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion22.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 22 - Traductor de AST a TAC con precedencia ===
