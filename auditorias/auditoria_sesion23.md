@@ -11,7 +11,11 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Generador de etiquetas e instrucciones goto  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion23_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Esta sesión me salió sin errores porque `nueva_etiqueta` es igual a `nuevo_temporal` de la sesión 21: solo cambia `_t` por `L`. Escribo la etiqueta con el valor actual del contador (`*contador`) y después lo incremento con `(*contador)++`, así la primera es `L0`.
+>
+> En `emitir_flujo` lo que tuve que entender es la diferencia entre un salto y una marca: `GOTO L2` significa "brinca a L2", y `L2:` significa "aquí está el lugar L2". La misma etiqueta se usa de las dos formas, y `es_salto` decide cuál se escribe.
+>
+> Para el caso NULL usé `dst[0] = '\0'`: con poner el fin de cadena en la primera posición, la cadena queda vacía. Ya lo había visto en el esqueleto de la sesión 9, que hacía exactamente eso.
 
 ---
 
@@ -86,14 +90,25 @@ void emitir_flujo(char *dst, int cap, const char *etiqueta, int es_salto) {
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion23_c.c artesano_sesion23_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 23 - Etiquetas y saltos incondicionales ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] nueva_etiqueta(L0)                 esperado: L0           obtenido: L0           OK
+[ 2] nueva_etiqueta(L5)                 esperado: L5           obtenido: L5           OK
+[ 3] emitir_flujo(GOTO L2)              esperado: GOTO L2      obtenido: GOTO L2      OK
+[ 4] emitir_flujo(marca L2)             esperado: L2:          obtenido: L2:          OK
+[ 5] emitir_flujo(NULL)                 esperado:              obtenido:              OK
+[ 6] nueva_etiqueta(L10)                esperado: L10          obtenido: L10          OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion23.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 23 - Etiquetas y saltos incondicionales ===
