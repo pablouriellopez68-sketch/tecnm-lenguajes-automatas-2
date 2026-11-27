@@ -11,7 +11,11 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Estructura de ciclo en instrucciones TAC  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion25_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Esta sesión me salió sin errores, pero tuve que entender cómo se arma un ciclo sin tener ciclos. El TAC no tiene `while`: se hace con dos etiquetas y dos saltos. Una marca de inicio, un `IFFALSE` que sale al fin cuando la condición es falsa, un `GOTO` que regresa al inicio y la marca de fin. Lo que más pensé fue a qué etiqueta va cada salto: el `IFFALSE` va a `fin`, para salir, y el `GOTO` va a `ini`, para volver a revisar la condición.
+>
+> Usé una función auxiliar `linea` que guarda un texto en la posición `*n` y la aumenta, así cada instrucción es una sola llamada. También entendí por qué las etiquetas se toman de `*etiquetas` con `(*etiquetas)++`: así un segundo ciclo empieza en `L2` y no choca con el primero.
+>
+> El `for` resultó ser un `while` con dos líneas extra: la inicialización antes de la marca de inicio y la actualización justo antes del `GOTO`. Si `post` es NULL, simplemente no se escribe, y por eso un for sin actualización queda en 5 líneas en lugar de 6.
 
 ---
 
@@ -104,14 +108,28 @@ void emitir_for(char lineas[][64], int max, int *n, const char *inicio, const ch
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion25_c.c artesano_sesion25_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 25 - Esqueleto TAC de while y for ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] while: marca de inicio             esperado: L0:          obtenido: L0:          OK
+[ 2] while: condicion
+     esperado: IFFALSE a < b GOTO L1
+     obtenido: IFFALSE a < b GOTO L1
+     -> OK
+[ 3] dos ciclos sin colision            esperado: L2:          obtenido: L2:          OK
+[ 4] for: inicializacion                esperado: i = 0        obtenido: i = 0        OK
+[ 5] for: actualizacion                 esperado: i = i + 1    obtenido: i = i + 1    OK
+[ 6] for sin post (NULL)                esperado: 5            obtenido: 5            OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion25.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 25 - Esqueleto TAC de while y for ===
