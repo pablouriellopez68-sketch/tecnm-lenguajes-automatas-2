@@ -11,7 +11,11 @@
 ## 1. Fase 1: El Artesano (Dificultad Manual)
 *Reto:* Representación en Cuádruplos (op,a,b,r)  
 *Describe qué problema o restricción de memoria/sintaxis identificaste al codificar a mano:*
-> ✏️ **PENDIENTE (Pablo):** esta fase es sin IA. Escribe aquí, con tus palabras, en qué te atoraste al programar `artesano_sesion21_c.c` a mano (errores de compilación, punteros, casos que no se te ocurrieron, etc.).
+> Esta sesión me salió sin errores porque ya había usado `snprintf` en la sesión 9. Lo nuevo fue el contador como puntero: para leer el número hay que escribir `*contador`, y para aumentarlo `(*contador)++`. Los paréntesis son necesarios, porque `*contador++` movería el puntero en lugar de sumarle uno al número. El orden también importa: primero escribo `_t` con el valor actual y después incremento, por eso la primera llamada da `_t0`.
+>
+> En `emitir_cuadruplo` aprendí el operador `? :`: `a1 ? a1 : "_"` significa "si `a1` existe úsalo, y si es NULL pon un guion bajo". Es como un `if` / `else` dentro de una sola expresión, y me sirvió para no escribir cuatro `if` distintos.
+>
+> También entendí para qué sirven los cuádruplos: cada operación se vuelve una línea con el operador, sus dos argumentos y dónde se guarda el resultado. Cuando falta un argumento, como en una asignación `x = a` o en un `goto`, el guion bajo deja claro que ese lugar está vacío a propósito.
 
 ---
 
@@ -85,14 +89,34 @@ void emitir_cuadruplo(char *dst, int cap, const char *op, const char *a1, const 
 
 ### Salida del harness
 
-Contra la implementación propia de la Fase 1:
+Ejecutado en Google Colab.
+
+Contra la implementación propia de la Fase 1 (`test_artesano`):
 
 ```text
-✏️ PENDIENTE (Pablo): pega aquí la salida de la celda
-!gcc ... harness_sesion21_c.c artesano_sesion21_c.c -o test_artesano && ./test_artesano
+=== AUDITORIA SESION 21 - Cuadruplos y temporales unicos ===
+Caso                               esperado:              obtenido:              resultado
+[ 1] nuevo_temporal(_t0)                esperado: _t0          obtenido: _t0          OK
+[ 2] nuevo_temporal(_t7)                esperado: _t7          obtenido: _t7          OK
+[ 3] cuadruplo de a + b
+     esperado: (+, a, b, _t0)
+     obtenido: (+, a, b, _t0)
+     -> OK
+[ 4] cuadruplo de _t0 * c
+     esperado: (*, _t0, c, _t1)
+     obtenido: (*, _t0, c, _t1)
+     -> OK
+[ 5] asignacion simple                  esperado: (=, a, _, x) obtenido: (=, a, _, x) OK
+[ 6] goto sin operandos
+     esperado: (goto, L1, _, _)
+     obtenido: (goto, L1, _, _)
+     -> OK
+
+RESULTADO: 6/6 pruebas superadas
+TODO EN VERDE. Documenta tu auditoria en auditorias/auditoria_sesion21.md
 ```
 
-Contra el código devuelto por la IA:
+Contra el código devuelto por la IA (`test_ia`):
 
 ```text
 === AUDITORIA SESION 21 - Cuadruplos y temporales unicos ===
